@@ -1,6 +1,6 @@
 import { createContext, useMemo, useState } from 'react';
 
-type StepContextType = {
+export type StepContextType = {
   step: number;
   setStep: (step: number) => void;
 };
@@ -10,12 +10,12 @@ const StepContext = createContext<StepContextType>({
   setStep: () => {},
 });
 
-const StepContextProvider = ({ children }: { children: React.ReactNode }) => {
-  const [step, setStep] = useState(1);
+export const StepContextProvider = ({ children }: { children: React.ReactNode }) => {
+  const [step, setStep] = useState<number>(1);
 
-  const memoValue = useMemo(() => ({ step, setStep }), [step]);
+  const memoValue = useMemo(() => ({ step, setStep }), [step, setStep]);
 
   return <StepContext value={memoValue}>{children}</StepContext>;
 };
 
-export { StepContext, StepContextProvider };
+export { StepContext };

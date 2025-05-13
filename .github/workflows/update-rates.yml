@@ -1,0 +1,34 @@
+name: Update Exchange Rates
+
+on:
+  schedule:
+    - cron: '0 */12 * * *' # 每 12 小時
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install deps
+        run: npm install node-fetch
+
+      - name: Fetch rates and write to JSON
+        run: node fetch.js
+        env:
+          EXCHANGE_RATE_KEY: ${{ secrets.EXCHANGE_RATE_KEY }}
+
+      - name: Commit and push
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/rates.json
+          git commit -m "Update rates.json" || echo "No changes"
+          git push

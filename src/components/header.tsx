@@ -18,7 +18,7 @@ export const Header = () => {
   return (
     <header className='border-b p-4 flex items-center justify-between'>
       <div className='flex items-center gap-2'>
-        <h1 className='font-semibold text-lg'>💸 What Else Could You Buy?</h1>
+        <h1 className='font-semibold text-lg'>💸 What Else Can You Buy?</h1>
       </div>
 
       <Button
