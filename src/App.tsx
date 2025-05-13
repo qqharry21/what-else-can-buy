@@ -1,9 +1,12 @@
-import { ShoppingBag } from 'lucide-react';
 import { useState } from 'react';
 
-import { Card, CardContent } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Toggle } from '@/components/ui/toggle';
+import { Footer } from './components/footer';
+import { Header } from './components/header';
+import { HomePage } from './components/pages/home-page';
+import { SettingsPage } from './components/pages/settings-page';
+import { GlobalContextProvider } from './contexts/global-context';
+import { type Page } from './contexts/page-context';
+import { usePageContext } from './hooks/usePageContext';
 
 type Category = 'food' | 'fun' | 'save';
 type Currency = 'TWD' | 'USD' | 'JPY';
@@ -19,6 +22,7 @@ const alternatives: Record<Category, { label: string; unitPrice: number; icon: s
     { label: 'Bubble tea', unitPrice: 50, icon: '🧋' },
     { label: 'Fast food meal', unitPrice: 120, icon: '🍔' },
     { label: 'Ramen bowl', unitPrice: 250, icon: '🍜' },
+    { label: 'Braised pork rice', unitPrice: 100, icon: '🍚' },
   ],
   fun: [
     { label: 'Movie ticket', unitPrice: 280, icon: '🎬' },
@@ -32,7 +36,13 @@ const alternatives: Record<Category, { label: string; unitPrice: number; icon: s
   ],
 };
 
+const pageContent: Record<Page, React.ReactNode> = {
+  home: <HomePage />,
+  settings: <SettingsPage />,
+};
+
 function App() {
+  const { page } = usePageContext();
   const [amount, setAmount] = useState('');
   const [currency, setCurrency] = useState<Currency>('TWD');
   const [category, setCategory] = useState<Category>('food');
@@ -98,116 +108,15 @@ function App() {
   //   </div>
   // );
   return (
-    <div className='w-[350px] h-[500px] bg-white flex flex-col'>
-      {/* Header */}
-      <header className='border-b p-4 flex items-center justify-between'>
-        <div className='flex items-center gap-2'>
-          <ShoppingBag className='h-5 w-5 text-emerald-500' />
-          <h1 className='font-semibold text-lg'>What Else Could You Buy?</h1>
-        </div>
-        {/* <Link href='/settings'>
-          <Button
-            variant='ghost'
-            size='icon'>
-            <Settings className='h-5 w-5' />
-            <span className='sr-only'>Settings</span>
-          </Button>
-        </Link> */}
-      </header>
+    <GlobalContextProvider>
+      <div className='w-[500px] min-h-fit h-[600px] bg-white flex flex-col'>
+        <Header />
 
-      {/* Main Content */}
-      <main className='flex-1 overflow-auto p-4'>
-        <div className='mb-4'>
-          <h2 className='text-lg font-medium'>Current Product</h2>
-          <Card className='mt-2'>
-            <CardContent className='p-3'>
-              <div className='flex items-center gap-3'>
-                <div className='h-16 w-16 relative rounded overflow-hidden flex-shrink-0'>
-                  {/* <Image
-                    src='/placeholder.svg?height=64&width=64'
-                    alt='Current product'
-                    fill
-                    className='object-cover'
-                  /> */}
-                </div>
-                <div>
-                  <h3 className='font-medium text-sm line-clamp-1'>
-                    Wireless Noise Cancelling Headphones
-                  </h3>
-                  <p className='text-emerald-600 font-bold'>$299.99</p>
-                  <p className='text-xs text-muted-foreground'>Amazon.com</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        <main className='flex-1 overflow-auto p-4'>{pageContent[page]}</main>
 
-        <div>
-          <div className='flex items-center justify-between mb-2'>
-            <h2 className='text-lg font-medium'>What else you could buy:</h2>
-            <Toggle aria-label='Toggle favorites'>
-              <ShoppingBag className='h-4 w-4' />
-              <span className='ml-1 text-xs'>Favorites</span>
-            </Toggle>
-          </div>
-
-          <Tabs
-            defaultValue='all'
-            className='w-full'>
-            <TabsList className='grid w-full grid-cols-3 mb-2'>
-              <TabsTrigger value='all'>All</TabsTrigger>
-              <TabsTrigger value='tech'>Tech</TabsTrigger>
-              <TabsTrigger value='home'>Home</TabsTrigger>
-            </TabsList>
-            <TabsContent
-              value='all'
-              className='mt-0'>
-              <div className='space-y-3'>
-                {/* {alternativeProducts.map((product, index) => (
-                  <AlternativeProductCard
-                    key={index}
-                    product={product}
-                  />
-                ))} */}
-              </div>
-            </TabsContent>
-            <TabsContent
-              value='tech'
-              className='mt-0'>
-              <div className='space-y-3'>
-                {/* {alternativeProducts
-                  .filter((p) => p.category === 'tech')
-                  .map((product, index) => (
-                    <AlternativeProductCard
-                      key={index}
-                      product={product}
-                    />
-                  ))} */}
-              </div>
-            </TabsContent>
-            <TabsContent
-              value='home'
-              className='mt-0'>
-              <div className='space-y-3'>
-                {/* {alternativeProducts
-                  .filter((p) => p.category === 'home')
-                  .map((product, index) => (
-                    <AlternativeProductCard
-                      key={index}
-                      product={product}
-                    />
-                  ))} */}
-              </div>
-            </TabsContent>
-          </Tabs>
-        </div>
-      </main>
-
-      {/* Footer */}
-      <footer className='border-t p-3 text-center text-xs text-muted-foreground'>
-        What Else Could You Buy? v1.0.0
-      </footer>
-    </div>
+        <Footer />
+      </div>
+    </GlobalContextProvider>
   );
 }
 
