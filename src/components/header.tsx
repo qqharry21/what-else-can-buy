@@ -1,29 +1,15 @@
-import { ArrowLeftIcon, SettingsIcon } from 'lucide-react';
-import { useCallback } from 'react';
-
-import { Button } from '@/components/ui/button';
-import { usePageContext } from '@/hooks/usePageContext';
 import { useTranslation } from 'react-i18next';
 
 export const Header = () => {
-  const { page, setPage } = usePageContext();
   const { t } = useTranslation();
 
-  const handleClick = useCallback(() => {
-    if (page === 'home') {
-      setPage('settings');
-    } else {
-      setPage('home');
-    }
-  }, [page, setPage]);
-
   return (
-    <header className='border-b p-4 flex items-center justify-between'>
+    <header className='border-b p-4 flex items-center justify-center'>
       <div className='flex items-center gap-2'>
         <h1 className='font-semibold text-lg'>💸 {t('appName')}</h1>
       </div>
 
-      <Button
+      {/* <Button
         variant='ghost'
         size='icon'
         onClick={handleClick}>
@@ -38,7 +24,7 @@ export const Header = () => {
             <span className='sr-only'>Home</span>
           </>
         )}
-      </Button>
+      </Button> */}
     </header>
   );
 };
