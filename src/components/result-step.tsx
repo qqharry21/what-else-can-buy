@@ -6,7 +6,6 @@ import { useStepContext } from '@/hooks/useStepContext';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-import { alternatives, exchangeRates } from '@/lib/data';
 import { type FormSchema } from '@/lib/schema';
 import type { ExchangeInfo, TimeCost } from '@/lib/types';
 import { useCallback } from 'react';
@@ -83,13 +82,8 @@ const CurrencyRate = ({
 
 export const ResultStep = ({ result }: { result: ExchangeInfo | null }) => {
   console.log('🚨 - result', result);
-  const { getValues, watch, reset } = useFormContext<FormSchema>();
+  const { getValues, reset } = useFormContext<FormSchema>();
   const { setStep } = useStepContext();
-
-  const amount = watch('amount');
-  const currency = watch('currency');
-
-  const converted = amount * exchangeRates[currency];
 
   const handleTryAgain = useCallback(() => {
     reset();
@@ -138,12 +132,12 @@ export const ResultStep = ({ result }: { result: ExchangeInfo | null }) => {
           value='food'
           className='mt-0'>
           <ul className='space-y-3'>
-            {alternatives.food.map((product) => (
+            {/* {alternatives.food.map((product) => (
               <li key={product.label}>
                 <h3 className='text-lg font-medium'>{product.label}</h3>
                 {product.icon} {(converted / product.unitPrice).toFixed(1)} × {product.label}
               </li>
-            ))}
+            ))} */}
           </ul>
         </TabsContent>
         <TabsContent
@@ -151,12 +145,12 @@ export const ResultStep = ({ result }: { result: ExchangeInfo | null }) => {
           className='mt-0'>
           <div className='space-y-3'>
             <ul className='space-y-3'>
-              {alternatives.fun.map((product) => (
+              {/* {alternatives.fun.map((product) => (
                 <li key={product.label}>
                   <h3 className='text-lg font-medium'>{product.label}</h3>
                   {product.icon} {(converted / product.unitPrice).toFixed(1)} × {product.label}
                 </li>
-              ))}
+              ))} */}
             </ul>
           </div>
         </TabsContent>
@@ -165,12 +159,12 @@ export const ResultStep = ({ result }: { result: ExchangeInfo | null }) => {
           className='mt-0'>
           <div className='space-y-3'>
             <ul className='space-y-3'>
-              {alternatives.travel.map((product) => (
+              {/* {alternatives.travel.map((product) => (
                 <li key={product.label}>
                   <h3 className='text-lg font-medium'>{product.label}</h3>
                   {product.icon} {(converted / product.unitPrice).toFixed(1)} × {product.label}
                 </li>
-              ))}
+              ))} */}
             </ul>
           </div>
         </TabsContent>

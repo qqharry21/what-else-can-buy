@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "What Else Could You Buy?",
+  "version": "1.0",
+  "description": "Shows what else you could buy for the same price.",
+  "action": {
+    "default_popup": "index.html"
+  },
+  "permissions": ["activeTab", "storage", "scripting"],
+  "host_permissions": ["<all_urls>"]
+}

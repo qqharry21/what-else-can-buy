@@ -1,4 +1,4 @@
-import type { Category, Currency } from '@/contexts/global-context';
+import type { Category } from './types';
 
 export const alternatives: Record<Category, { label: string; unitPrice: number; icon: string }[]> =
   {
@@ -26,9 +26,3 @@ export const alternatives: Record<Category, { label: string; unitPrice: number; 
       },
     ],
   };
-
-export const exchangeRates: Record<Currency, number> = {
-  TWD: 1,
-  USD: 30,
-  JPY: 0.22,
-};

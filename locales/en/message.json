@@ -1,0 +1,29 @@
+{
+  "appName": "What Else Could You Buy?",
+  "timeCostResponses": {
+    "short": [
+      "That's just a coffee break! Go ahead.",
+      "A quick task worth the joy!",
+      "Barely 15 minutes \u2014 not bad at all.",
+      "Low effort, low guilt."
+    ],
+    "medium": [
+      "That\u2019s a half-day of your life. Choose wisely.",
+      "Think twice \u2014 you could have watched 5 movies.",
+      "Would you trade an entire afternoon for this?",
+      "That\u2019s a long meeting's worth of work."
+    ],
+    "long": [
+      "This is a full week of work. Worth it?",
+      "You\u2019re trading sleep, time, and weekends for this.",
+      "A hundred hours? That\u2019s a whole Netflix season binge!",
+      "Would Future You still thank you after this time sink?"
+    ],
+    "extreme": [
+      "That's almost a month of your life!",
+      "Is this worth more than your vacation?",
+      "That\u2019s legendary-level commitment.",
+      "You could've written a short novel instead."
+    ]
+  }
+}
