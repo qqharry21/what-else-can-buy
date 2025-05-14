@@ -1,4 +1,4 @@
-import type { Currency, Product, Salary, TimeCost } from './types';
+import type { Currency, ExchangeInfo, Product, Salary } from './types';
 
 const HOURS_PER_DAY = 8; // Work hours per day
 const DAYS_PER_MONTH = 20; // Work days per month
@@ -32,21 +32,6 @@ export function calculateSalaryPerHour(salary: Salary): number {
 }
 
 /**
- * Convert product price to salary currency
- * @param product product
- * @param salaryCurrency salary currency
- * @returns product price, rate
- */
-async function convertProductPriceToSalaryCurrency(product: Product, salaryCurrency: Currency) {
-  if (product.currency === salaryCurrency) {
-    return { price: product.price, rate: 1 };
-  }
-  const rates = await getCachedRates();
-  const rate = rates[product.currency];
-  return { price: product.price * rate, rate };
-}
-
-/**
  * Get cached rates from local json file
  * Update rates via Github Actions
  * @returns rates
@@ -57,32 +42,57 @@ export async function getCachedRates(): Promise<Record<string, number>> {
   return data.rates;
 }
 
+// Helper to convert any amount to TWD and return the rate
+async function convertAmountAndRateToTWD(amount: number, currency: Currency) {
+  const rates = await getCachedRates();
+  if (currency === 'TWD') return { amount, rate: 1 };
+  const rate = rates[currency];
+  if (!rate) throw new Error(`No rate for currency: ${currency}`);
+  return { amount: amount / rate, rate: 1 / rate };
+}
+
 /**
  * Calculate the time required to purchase a product, including hours, days, or years
+ * Also returns salary and product price in TWD, and the TWD rate for both currencies
  * @param params salary, product
  */
 export async function calculateProductTime(params: {
   salary: Salary;
   product: Product;
-}): Promise<TimeCost> {
+}): Promise<ExchangeInfo> {
   const { salary, product } = params;
 
-  // Convert product price to salary currency
-  const { price: productPriceInSalaryCurrency, rate } = await convertProductPriceToSalaryCurrency(
-    product,
-    salary.currency
-  );
-  console.log('🚨 - productPriceInSalaryCurrency', productPriceInSalaryCurrency);
-  console.log('🚨 - rate', rate);
-
+  // Calculate salary per hour in original currency, then convert to TWD
   const salaryPerHour = calculateSalaryPerHour(salary);
-  console.log('🚨 - salaryPerHour', salaryPerHour);
+  const [salaryTWDResult, productTWDResult] = await Promise.all([
+    convertAmountAndRateToTWD(salaryPerHour, salary.currency),
+    convertAmountAndRateToTWD(product.price, product.currency),
+  ]);
+
+  // Calculate total hours needed to buy the product
+  const totalHours = parseFloat((productTWDResult.amount / salaryTWDResult.amount).toFixed(1));
+
+  const years = Math.floor(totalHours / (HOURS_PER_DAY * DAYS_PER_MONTH * MONTHS_PER_YEAR));
+  const months = Math.floor(
+    (totalHours % (HOURS_PER_DAY * DAYS_PER_MONTH * MONTHS_PER_YEAR)) /
+      (HOURS_PER_DAY * DAYS_PER_MONTH)
+  );
+  const days = Math.floor((totalHours % (HOURS_PER_DAY * DAYS_PER_MONTH)) / HOURS_PER_DAY);
+  const hours = parseFloat((totalHours % HOURS_PER_DAY).toFixed(1));
 
   return {
-    years: 0,
-    months: 0,
-    days: 0,
-    hours: 0,
-    totalHours: 0,
+    timeCost: {
+      years,
+      months,
+      days,
+      hours,
+      totalHours,
+    },
+    salaryCurrency: salary.currency,
+    productCurrency: product.currency,
+    salaryPerHourTWD: +salaryTWDResult.amount.toFixed(2),
+    productPriceTWD: +productTWDResult.amount.toFixed(2),
+    salaryCurrencyToTWD: +salaryTWDResult.rate.toFixed(2),
+    productCurrencyToTWD: +productTWDResult.rate.toFixed(2),
   };
 }

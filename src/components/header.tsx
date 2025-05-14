@@ -1,8 +1,8 @@
 import { ArrowLeftIcon, SettingsIcon } from 'lucide-react';
-
-import { usePageContext } from '@/hooks/usePageContext';
 import { useCallback } from 'react';
-import { Button } from './ui/button';
+
+import { Button } from '@/components/ui/button';
+import { usePageContext } from '@/hooks/usePageContext';
 
 export const Header = () => {
   const { page, setPage } = usePageContext();

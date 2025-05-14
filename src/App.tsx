@@ -1,9 +1,12 @@
+import type { Page } from './contexts/page-context';
+
 import { Footer } from './components/footer';
 import { Header } from './components/header';
-import { HomePage } from './components/pages/home';
+import { HomePage } from './components/pages/home-page';
 import { SettingsPage } from './components/pages/settings-page';
+
 import { GlobalContextProvider } from './contexts/global-context';
-import { type Page } from './contexts/page-context';
+
 import { usePageContext } from './hooks/usePageContext';
 
 const pageContent: Record<Page, React.ReactNode> = {

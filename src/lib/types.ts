@@ -20,3 +20,13 @@ export interface TimeCost {
   hours: number;
   totalHours: number;
 }
+
+export type ExchangeInfo = {
+  timeCost: TimeCost;
+  salaryCurrency: Currency;
+  productPriceTWD: number;
+  productCurrency: Currency;
+  salaryCurrencyToTWD: number;
+  productCurrencyToTWD: number;
+  salaryPerHourTWD: number;
+};
