@@ -30,3 +30,10 @@ export type ExchangeInfo = {
   productCurrencyToTWD: number;
   salaryPerHourTWD: number;
 };
+
+export type Alternative = {
+  label: string;
+  unitPrice: number;
+  icon: string;
+  unit?: string;
+};

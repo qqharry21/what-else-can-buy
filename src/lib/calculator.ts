@@ -1,4 +1,4 @@
-import type { Currency, ExchangeInfo, Product, Salary } from './types';
+import type { Currency, ExchangeInfo, Product, Salary, TimeCost } from './types';
 
 const HOURS_PER_DAY = 8; // Work hours per day
 const DAYS_PER_MONTH = 20; // Work days per month
@@ -96,3 +96,15 @@ export async function calculateProductTime(params: {
     productCurrencyToTWD: +productTWDResult.rate.toFixed(2),
   };
 }
+
+/**
+ * Get the time cost level, you can adjust the level by yourself
+ * @param timeCost time cost
+ * @returns time cost level
+ */
+export const getTimeCostLevel = (timeCost: TimeCost) => {
+  if (timeCost.years > 0 || timeCost.months > 6) return 'extreme';
+  if (timeCost.months > 0 || timeCost.days > 20) return 'long';
+  if (timeCost.days > 0 || timeCost.hours > 8) return 'medium';
+  return 'short';
+};

@@ -1,4 +1,4 @@
-import { RefreshCwIcon, ShareIcon } from 'lucide-react';
+import { QuoteIcon, RefreshCwIcon, ShareIcon } from 'lucide-react';
 import { useFormContext } from 'react-hook-form';
 
 import { useStepContext } from '@/hooks/useStepContext';
@@ -6,10 +6,13 @@ import { useStepContext } from '@/hooks/useStepContext';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
+import { getTimeCostLevel } from '@/lib/calculator';
 import { type FormSchema } from '@/lib/schema';
-import type { ExchangeInfo, TimeCost } from '@/lib/types';
+import type { Alternative, ExchangeInfo, TimeCost } from '@/lib/types';
+import { sortByUnitPrice } from '@/lib/utils';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Card, CardContent } from './ui/card';
 
 const TimeCostGrid = ({ timeCost }: { timeCost: TimeCost }) => {
   const { t } = useTranslation();
@@ -76,18 +79,125 @@ const CurrencyRate = ({
   const { t } = useTranslation();
   return (
     <div className='text-center text-sm text-neutral-500'>
-      <p>{t('result.exchangeRate.title')}</p>
       {productCurrencyToTWD !== 1 && <p> 1 TWD ≈ {`${productCurrencyToTWD} ${productCurrency}`}</p>}
       {salaryCurrencyToTWD !== 1 && <p> 1 TWD ≈ {`${salaryCurrencyToTWD} ${salaryCurrency}`}</p>}
-      {productCurrencyToTWD === salaryCurrencyToTWD && (
-        <p>{t('result.exchangeRate.same_currency')}</p>
-      )}
+      {productCurrencyToTWD === salaryCurrencyToTWD && <p>{t('result.same_currency')}</p>}
     </div>
   );
 };
 
+const TimeCostResponse = ({ timeCost }: { timeCost: TimeCost }) => {
+  const { t } = useTranslation();
+  const level = getTimeCostLevel(timeCost);
+  // 取得對應陣列
+  const responses = t(`timeCostResponses.${level}`, { returnObjects: true }) as string[];
+  // 隨機選一句
+  const response = responses[Math.floor(Math.random() * responses.length)];
+
+  return (
+    <div className='text-center p-4 bg-neutral-200 rounded-md flex items-start justify-center gap-4'>
+      <QuoteIcon className='w-3 h-3 text-neutral-900' />
+      <p className='text-sm text-neutral-800'>{response}</p>
+      <QuoteIcon className='w-3 h-3 text-neutral-900' />
+    </div>
+  );
+};
+
+type AlternativeTabs = 'food' | 'cool' | 'travel';
+
+const AlternativeTabs = ({ productPrice }: { productPrice: number }) => {
+  const { t } = useTranslation();
+  const alternatives = t('alternatives', { returnObjects: true }) as Record<
+    AlternativeTabs,
+    Alternative[]
+  >;
+
+  return (
+    <Tabs
+      defaultValue='food'
+      className='w-full flex-1'>
+      <TabsList className='grid w-full grid-cols-3 mb-2'>
+        <TabsTrigger
+          value='food'
+          title='Food'>
+          🍔
+        </TabsTrigger>
+        <TabsTrigger
+          value='cool'
+          title='Cool stuff'>
+          😎
+        </TabsTrigger>
+        <TabsTrigger
+          value='travel'
+          title='Travel'>
+          ✈️
+        </TabsTrigger>
+      </TabsList>
+      <TabsContent
+        value='food'
+        className='mt-0 grid grid-cols-2 gap-4'>
+        {sortByUnitPrice(alternatives.food).map((item) => (
+          <AlternativeCard
+            key={item.label}
+            item={item}
+            productPrice={productPrice}
+          />
+        ))}
+      </TabsContent>
+      <TabsContent
+        value='cool'
+        className='mt-0 grid grid-cols-2 gap-4'>
+        {sortByUnitPrice(alternatives.cool).map((item) => (
+          <AlternativeCard
+            key={item.label}
+            item={item}
+            productPrice={productPrice}
+          />
+        ))}
+      </TabsContent>
+      <TabsContent
+        value='travel'
+        className='mt-0 grid grid-cols-2 gap-4'>
+        {sortByUnitPrice(alternatives.travel).map((item) => (
+          <AlternativeCard
+            key={item.label}
+            item={item}
+            productPrice={productPrice}
+          />
+        ))}
+      </TabsContent>
+    </Tabs>
+  );
+};
+
+const AlternativeCard = ({ item, productPrice }: { item: Alternative; productPrice: number }) => {
+  const quantity = Math.floor(productPrice / item.unitPrice);
+  const isZero = quantity === 0;
+  if (isZero) return null;
+
+  return (
+    <Card className='p-0 overflow-hidden'>
+      <CardContent className='p-4'>
+        <div className='flex items-center gap-3'>
+          <p className='text-2xl text-muted-foreground'>{item.icon}</p>
+          <div className='flex-1'>
+            <div className='flex justify-between items-start'>
+              <h3 className='font-medium text-sm line-clamp-1'>{item.label}</h3>
+            </div>
+            <p className='text-neutral-900 font-bold text-xl'>
+              {quantity}
+              {item.unit && (
+                <span className='ml-2 text-neutral-600 font-medium text-sm'>{item.unit}</span>
+              )}
+            </p>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
 export const ResultStep = ({ result }: { result: ExchangeInfo | null }) => {
-  console.log('🚨 - result', result);
   const { t } = useTranslation();
   const { reset } = useFormContext<FormSchema>();
   const { setStep } = useStepContext();
@@ -110,73 +220,15 @@ export const ResultStep = ({ result }: { result: ExchangeInfo | null }) => {
           productCurrency={result.productCurrency}
           salaryCurrency={result.salaryCurrency}
         />
+        <TimeCostResponse timeCost={result.timeCost} />
       </div>
+
       <h3 className='text-lg mb-4 text-center text-pretty font-medium'>
         {t('result.alternatives.title')}
       </h3>
-      <Tabs
-        defaultValue='food'
-        className='w-full flex-1'>
-        <TabsList className='grid w-full grid-cols-3 mb-2'>
-          <TabsTrigger
-            value='food'
-            title='Food'>
-            🍔
-          </TabsTrigger>
-          <TabsTrigger
-            value='fun'
-            title='Cool stuff'>
-            😎
-          </TabsTrigger>
-          <TabsTrigger
-            value='travel'
-            title='Travel'>
-            ✈️
-          </TabsTrigger>
-        </TabsList>
+      <AlternativeTabs productPrice={result.productPriceTWD} />
 
-        <TabsContent
-          value='food'
-          className='mt-0'>
-          <ul className='space-y-3'>
-            {/* {alternatives.food.map((product) => (
-              <li key={product.label}>
-                <h3 className='text-lg font-medium'>{product.label}</h3>
-                {product.icon} {(converted / product.unitPrice).toFixed(1)} × {product.label}
-              </li>
-            ))} */}
-          </ul>
-        </TabsContent>
-        <TabsContent
-          value='fun'
-          className='mt-0'>
-          <div className='space-y-3'>
-            <ul className='space-y-3'>
-              {/* {alternatives.fun.map((product) => (
-                <li key={product.label}>
-                  <h3 className='text-lg font-medium'>{product.label}</h3>
-                  {product.icon} {(converted / product.unitPrice).toFixed(1)} × {product.label}
-                </li>
-              ))} */}
-            </ul>
-          </div>
-        </TabsContent>
-        <TabsContent
-          value='travel'
-          className='mt-0'>
-          <div className='space-y-3'>
-            <ul className='space-y-3'>
-              {/* {alternatives.travel.map((product) => (
-                <li key={product.label}>
-                  <h3 className='text-lg font-medium'>{product.label}</h3>
-                  {product.icon} {(converted / product.unitPrice).toFixed(1)} × {product.label}
-                </li>
-              ))} */}
-            </ul>
-          </div>
-        </TabsContent>
-      </Tabs>
-      <div className='flex justify-center gap-4'>
+      <div className='flex mt-4 justify-center gap-4'>
         <Button
           type='button'
           onClick={async () => {

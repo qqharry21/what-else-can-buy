@@ -1,14 +1,9 @@
 import { useEffect } from 'react';
 
 export const SettingsPage = () => {
-  function getAcceptLanguages() {
-    chrome.i18n.getAcceptLanguages(function (languageList) {
-      console.log('🚨 - languageList', languageList);
-    });
-  }
-
   useEffect(() => {
-    getAcceptLanguages();
+    const language = chrome.i18n.getUILanguage();
+    console.log('🚨 - language', language);
   }, []);
 
   return <div>SettingsPage</div>;

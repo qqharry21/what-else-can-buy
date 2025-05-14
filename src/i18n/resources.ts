@@ -1,5 +1,6 @@
 import en from '../../locales/en/message.json';
 import enZod from '../../locales/en/zod.json';
+
 import zh_TW from '../../locales/zh_TW/message.json';
 import zh_TWZod from '../../locales/zh_TW/zod.json';
 
