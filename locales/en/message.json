@@ -58,9 +58,9 @@
     "yearly": "Yearly"
   },
   "currency": {
-    "TWD": "New Taiwan Dollar",
-    "USD": "United States Dollar",
-    "JPY": "Japanese Yen"
+    "TWD": "TWD",
+    "USD": "USD",
+    "JPY": "JPY"
   },
   "timeCostResponses": {
     "short": [

@@ -65,7 +65,7 @@ export const ProductStep = () => {
                   defaultValue={field.value}
                   onValueChange={field.onChange}>
                   <SelectTrigger className='w-full'>
-                    <SelectValue placeholder={t('productStep.currency.placeholder')} />
+                    <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value='TWD'>🇹🇼 {t('currency.TWD')}</SelectItem>

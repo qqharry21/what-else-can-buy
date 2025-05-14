@@ -65,7 +65,7 @@ export const SalaryStep = () => {
                   defaultValue={field.value}
                   onValueChange={field.onChange}>
                   <SelectTrigger className='w-full'>
-                    <SelectValue placeholder={t('salaryStep.salaryType.placeholder')} />
+                    <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value='hourly'>{t('salaryType.hourly')}</SelectItem>
@@ -89,7 +89,7 @@ export const SalaryStep = () => {
                   defaultValue={field.value}
                   onValueChange={field.onChange}>
                   <SelectTrigger className='w-full'>
-                    <SelectValue placeholder={t('salaryStep.currency.placeholder')} />
+                    <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value='TWD'>🇹🇼 {t('currency.TWD')}</SelectItem>
