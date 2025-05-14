@@ -21,10 +21,10 @@ const HomePageInner = () => {
   const form = useForm<FormSchema>({
     mode: 'onBlur',
     defaultValues: {
-      amount: 60000,
+      amount: 30000,
       salaryType: 'monthly',
       currency: 'TWD',
-      productPrice: 10000,
+      productPrice: 0,
       productCurrency: 'TWD',
     },
     resolver: zodResolver(formSchema),
