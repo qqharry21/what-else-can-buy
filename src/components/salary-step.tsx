@@ -16,8 +16,10 @@ import {
 import { NumberInput } from '@/components/ui/number-input';
 import { useStepValidation } from '@/hooks/useStepValidation';
 import { type FormSchema } from '@/lib/schema';
+import { useTranslation } from 'react-i18next';
 
 export const SalaryStep = () => {
+  const { t } = useTranslation();
   const { setStep } = useStepContext();
   const { control } = useFormContext<FormSchema>();
   const { validateStep } = useStepValidation(['amount', 'salaryType', 'currency']);
@@ -31,7 +33,7 @@ export const SalaryStep = () => {
   return (
     <Card className='mb-4'>
       <CardHeader>
-        <CardTitle>Your Salary</CardTitle>
+        <CardTitle>{t('salaryStep.title')}</CardTitle>
       </CardHeader>
       <CardContent className='space-y-4'>
         <FormField
@@ -39,7 +41,7 @@ export const SalaryStep = () => {
           name='amount'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Amount</FormLabel>
+              <FormLabel>{t('salaryStep.amount.label')}</FormLabel>
               <FormControl>
                 <NumberInput
                   value={field.value}
@@ -56,19 +58,19 @@ export const SalaryStep = () => {
           name='salaryType'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Salary Type</FormLabel>
+              <FormLabel>{t('salaryStep.salaryType.label')}</FormLabel>
 
               <FormControl>
                 <Select
                   defaultValue={field.value}
                   onValueChange={field.onChange}>
                   <SelectTrigger className='w-full'>
-                    <SelectValue placeholder='Select a salary type' />
+                    <SelectValue placeholder={t('salaryStep.salaryType.placeholder')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value='hourly'>Hourly</SelectItem>
-                    <SelectItem value='monthly'>Monthly</SelectItem>
-                    <SelectItem value='yearly'>Yearly</SelectItem>
+                    <SelectItem value='hourly'>{t('salaryType.hourly')}</SelectItem>
+                    <SelectItem value='monthly'>{t('salaryType.monthly')}</SelectItem>
+                    <SelectItem value='yearly'>{t('salaryType.yearly')}</SelectItem>
                   </SelectContent>
                 </Select>
               </FormControl>
@@ -81,18 +83,18 @@ export const SalaryStep = () => {
           name='currency'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Currency</FormLabel>
+              <FormLabel>{t('salaryStep.currency.label')}</FormLabel>
               <FormControl>
                 <Select
                   defaultValue={field.value}
                   onValueChange={field.onChange}>
                   <SelectTrigger className='w-full'>
-                    <SelectValue placeholder='Select a currency' />
+                    <SelectValue placeholder={t('salaryStep.currency.placeholder')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value='TWD'>TWD</SelectItem>
-                    <SelectItem value='USD'>USD</SelectItem>
-                    <SelectItem value='JPY'>JPY</SelectItem>
+                    <SelectItem value='TWD'>🇹🇼 {t('currency.TWD')}</SelectItem>
+                    <SelectItem value='USD'>🇺🇸 {t('currency.USD')}</SelectItem>
+                    <SelectItem value='JPY'>🇯🇵 {t('currency.JPY')}</SelectItem>
                   </SelectContent>
                 </Select>
               </FormControl>
@@ -100,15 +102,13 @@ export const SalaryStep = () => {
             </FormItem>
           )}
         />
-        <p className='text-xs text-left text-gray-500'>
-          * 計算方式是以每天 8 小時工時，每月 20 天工作日為基準。
-        </p>
+        <p className='text-xs text-left text-gray-500'>* {t('salaryStep.note')}</p>
       </CardContent>
       <CardFooter className='justify-end'>
         <Button
           type='button'
           onClick={handleNext}>
-          Next
+          {t('next')}
         </Button>
       </CardFooter>
     </Card>

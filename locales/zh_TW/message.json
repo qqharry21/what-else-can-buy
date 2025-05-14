@@ -1,5 +1,67 @@
 {
   "appName": "你原本可以買什麼？",
+  "salaryStep": {
+    "title": "你的薪水",
+    "amount": {
+      "label": "薪水金額",
+      "placeholder": "e.g. 100"
+    },
+    "salaryType": {
+      "label": "薪水類型"
+    },
+    "currency": {
+      "label": "薪水幣值"
+    },
+    "note": "計算方式是以每天 8 小時工時，每月 20 天工作日為基準。"
+  },
+  "productStep": {
+    "title": "商品價格",
+    "description": "請輸入你想購買的商品價格",
+    "price": {
+      "label": "商品價格",
+      "placeholder": "e.g. 100"
+    },
+    "currency": {
+      "label": "商品幣值"
+    },
+    "note": "計算結果僅供參考，實際金額可能會因為匯率波動而有所不同。"
+  },
+  "result": {
+    "timeCost": {
+      "title": "這個商品花掉你"
+    },
+    "exchangeRate": {
+      "title": "匯率",
+      "same_currency": "幣值相同"
+    },
+    "alternatives": {
+      "title": "你如果沒有買這個商品，可以買些什麼？"
+    }
+  },
+  "years": "年",
+  "months": "月",
+  "days": "天",
+  "hours": "小時",
+  "next": "下一步",
+  "calculate": "計算",
+  "calculating": "計算中...",
+  "tryAgain": "重新計算",
+  "back": "上一步",
+  "share": {
+    "button": "分享這個結果",
+    "title": "快看！我需要花{{timeCost}}工時才能買這個商品！",
+    "text": "想知道你要花多少工時才能買這個商品嗎？ 想知道這個商品還可以買什麼嗎？ 快來看看這個擴充功能：https://chromewebstore.google.com/detail/what-can-i-buy/"
+  },
+  "salaryType": {
+    "hourly": "時薪",
+    "monthly": "月薪",
+    "yearly": "年薪"
+  },
+  "currency": {
+    "TWD": "新台幣",
+    "USD": "美金",
+    "JPY": "日幣"
+  },
   "timeCostResponses": {
     "short": [
       "這只是一次咖啡休息的時間！放膽去吧。",

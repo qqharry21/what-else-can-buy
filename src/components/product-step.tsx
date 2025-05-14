@@ -23,16 +23,18 @@ import {
 
 import { NumberInput } from '@/components/ui/number-input';
 import { type FormSchema } from '@/lib/schema';
+import { useTranslation } from 'react-i18next';
 
 export const ProductStep = () => {
+  const { t } = useTranslation();
   const { setStep } = useStepContext();
   const { formState, control } = useFormContext<FormSchema>();
 
   return (
     <Card className='mb-4'>
       <CardHeader>
-        <CardTitle>Product Price</CardTitle>
-        <CardDescription>Fill in the price of the product you want to buy.</CardDescription>
+        <CardTitle>{t('productStep.title')}</CardTitle>
+        <CardDescription>{t('productStep.description')}</CardDescription>
       </CardHeader>
       <CardContent className='space-y-4'>
         <FormField
@@ -40,12 +42,12 @@ export const ProductStep = () => {
           name='productPrice'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Price</FormLabel>
+              <FormLabel>{t('productStep.price.label')}</FormLabel>
               <FormControl>
                 <NumberInput
                   value={field.value}
                   onChange={field.onChange}
-                  placeholder='e.g. 100'
+                  placeholder={t('productStep.price.placeholder')}
                 />
               </FormControl>
               <FormMessage />
@@ -57,18 +59,18 @@ export const ProductStep = () => {
           name='productCurrency'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Currency</FormLabel>
+              <FormLabel>{t('productStep.currency.label')}</FormLabel>
               <FormControl>
                 <Select
                   defaultValue={field.value}
                   onValueChange={field.onChange}>
                   <SelectTrigger className='w-full'>
-                    <SelectValue placeholder='Select a currency' />
+                    <SelectValue placeholder={t('productStep.currency.placeholder')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value='TWD'>TWD</SelectItem>
-                    <SelectItem value='USD'>USD</SelectItem>
-                    <SelectItem value='JPY'>JPY</SelectItem>
+                    <SelectItem value='TWD'>🇹🇼 {t('currency.TWD')}</SelectItem>
+                    <SelectItem value='USD'>🇺🇸 {t('currency.USD')}</SelectItem>
+                    <SelectItem value='JPY'>🇯🇵 {t('currency.JPY')}</SelectItem>
                   </SelectContent>
                 </Select>
               </FormControl>
@@ -76,9 +78,7 @@ export const ProductStep = () => {
             </FormItem>
           )}
         />
-        <p className='text-xs text-gray-500'>
-          * 計算結果僅供參考，實際金額可能會因為匯率波動而有所不同。
-        </p>
+        <p className='text-xs text-gray-500'>* {t('productStep.note')}</p>
       </CardContent>
       <CardFooter className='flex justify-between'>
         <Button
@@ -86,7 +86,7 @@ export const ProductStep = () => {
           variant='outline'
           disabled={formState.isSubmitting}
           onClick={() => setStep(1)}>
-          Back
+          {t('back')}
         </Button>
         <Button
           type='submit'
@@ -94,10 +94,10 @@ export const ProductStep = () => {
           {formState.isSubmitting ? (
             <>
               <Loader2Icon className='h-4 w-4 animate-spin text-neutral-950' />
-              <span>Calculating</span>
+              <span>{t('calculating')}</span>
             </>
           ) : (
-            'Calculate'
+            t('calculate')
           )}
         </Button>
       </CardFooter>

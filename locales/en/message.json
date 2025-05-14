@@ -1,5 +1,70 @@
 {
   "appName": "What Else Could You Buy?",
+  "salaryStep": {
+    "title": "Your Salary",
+    "amount": {
+      "label": "Amount",
+      "placeholder": "e.g. 100"
+    },
+    "salaryType": {
+      "label": "Salary Type"
+    },
+    "currency": {
+      "label": "Currency"
+    },
+    "note": "The calculation is based on 8 hours of work per day, 20 working days per month."
+  },
+  "productStep": {
+    "title": "Product Price",
+    "description": "Fill in the price of the product you want to buy.",
+    "price": {
+      "label": "Price",
+      "placeholder": "e.g. 100"
+    },
+    "currency": {
+      "label": "Currency"
+    },
+    "note": "The result is for reference only, the actual amount may vary due to currency fluctuations."
+  },
+  "result": {
+    "timeCost": {
+      "title": "This product costs you"
+    },
+    "exchangeRate": {
+      "title": "Exchange Rate",
+      "same_currency": "Currency is the same"
+    },
+    "alternatives": {
+      "title": "What else you could buy, if you don't buy this product?"
+    },
+    "empty": {
+      "title": "Something went wrong, please try again."
+    }
+  },
+  "years": "years",
+  "months": "months",
+  "days": "days",
+  "hours": "hours",
+  "next": "Next",
+  "calculate": "Calculate",
+  "calculating": "Calculating...",
+  "tryAgain": "Try Again",
+  "back": "Back",
+  "share": {
+    "button": "Share this result",
+    "title": "Look! I need {{timeCost}} hours to buy this product!",
+    "text": "Want to know how much time you need to buy this product? Want to know what else you could buy with your salary? Check out this extension: https://chromewebstore.google.com/detail/what-can-i-buy/"
+  },
+  "salaryType": {
+    "hourly": "Hourly",
+    "monthly": "Monthly",
+    "yearly": "Yearly"
+  },
+  "currency": {
+    "TWD": "New Taiwan Dollar",
+    "USD": "United States Dollar",
+    "JPY": "Japanese Yen"
+  },
   "timeCostResponses": {
     "short": [
       "That's just a coffee break! Go ahead.",

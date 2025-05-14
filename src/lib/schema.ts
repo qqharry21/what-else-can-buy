@@ -1,10 +1,10 @@
-import { z } from 'zod';
+import { z } from '@/lib/zod';
 
 export const formSchema = z.object({
-  amount: z.number().min(1, { message: 'Amount must be greater than 0' }),
+  amount: z.number().min(1),
   salaryType: z.enum(['hourly', 'monthly', 'yearly']),
   currency: z.enum(['TWD', 'USD', 'JPY']),
-  productPrice: z.number().min(1, { message: 'Product price must be greater than 0' }),
+  productPrice: z.number().min(1),
   productCurrency: z.enum(['TWD', 'USD', 'JPY']),
 });
 

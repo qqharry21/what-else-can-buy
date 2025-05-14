@@ -70,7 +70,7 @@ export async function calculateProductTime(params: {
   ]);
 
   // Calculate total hours needed to buy the product
-  const totalHours = parseFloat((productTWDResult.amount / salaryTWDResult.amount).toFixed(1));
+  const totalHours = +(productTWDResult.amount / salaryTWDResult.amount).toFixed(1);
 
   const years = Math.floor(totalHours / (HOURS_PER_DAY * DAYS_PER_MONTH * MONTHS_PER_YEAR));
   const months = Math.floor(
@@ -78,7 +78,7 @@ export async function calculateProductTime(params: {
       (HOURS_PER_DAY * DAYS_PER_MONTH)
   );
   const days = Math.floor((totalHours % (HOURS_PER_DAY * DAYS_PER_MONTH)) / HOURS_PER_DAY);
-  const hours = parseFloat((totalHours % HOURS_PER_DAY).toFixed(1));
+  const hours = +(totalHours % HOURS_PER_DAY).toFixed(1);
 
   return {
     timeCost: {

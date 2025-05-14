@@ -9,25 +9,27 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { type FormSchema } from '@/lib/schema';
 import type { ExchangeInfo, TimeCost } from '@/lib/types';
 import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const TimeCostGrid = ({ timeCost }: { timeCost: TimeCost }) => {
+  const { t } = useTranslation();
   return (
     <div className='flex items-center gap-2 justify-center w-full mx-auto max-w-[400px]'>
       <TimeCostCard
         cost={timeCost.years}
-        label='Years'
+        label={t('years')}
       />
       <TimeCostCard
         cost={timeCost.months}
-        label='Months'
+        label={t('months')}
       />
       <TimeCostCard
         cost={timeCost.days}
-        label='Days'
+        label={t('days')}
       />
       <TimeCostCard
         cost={timeCost.hours}
-        label='Hours'
+        label={t('hours')}
       />
     </div>
   );
@@ -46,9 +48,10 @@ const TimeCostCard = ({ cost, label }: { cost: number; label: string }) => {
 };
 
 const ResultEmpty = ({ onClick }: { onClick: () => void }) => {
+  const { t } = useTranslation();
   return (
     <div className='flex-1 flex-col gap-8 flex items-center justify-center'>
-      <p className='text-lg text-gray-500'>Something went wrong, please try again.</p>
+      <p className='text-lg text-gray-500'>{t('result.empty.title')}</p>
       <Button
         type='button'
         variant='outline'
@@ -70,19 +73,23 @@ const CurrencyRate = ({
   productCurrency,
   salaryCurrency,
 }: CurrencyWithRate) => {
+  const { t } = useTranslation();
   return (
     <div className='text-center text-sm text-neutral-500'>
-      <p>Exchange rate</p>
+      <p>{t('result.exchangeRate.title')}</p>
       {productCurrencyToTWD !== 1 && <p> 1 TWD ≈ {`${productCurrencyToTWD} ${productCurrency}`}</p>}
       {salaryCurrencyToTWD !== 1 && <p> 1 TWD ≈ {`${salaryCurrencyToTWD} ${salaryCurrency}`}</p>}
-      {productCurrencyToTWD === salaryCurrencyToTWD && <p>Currency is the same</p>}
+      {productCurrencyToTWD === salaryCurrencyToTWD && (
+        <p>{t('result.exchangeRate.same_currency')}</p>
+      )}
     </div>
   );
 };
 
 export const ResultStep = ({ result }: { result: ExchangeInfo | null }) => {
   console.log('🚨 - result', result);
-  const { getValues, reset } = useFormContext<FormSchema>();
+  const { t } = useTranslation();
+  const { reset } = useFormContext<FormSchema>();
   const { setStep } = useStepContext();
 
   const handleTryAgain = useCallback(() => {
@@ -94,8 +101,8 @@ export const ResultStep = ({ result }: { result: ExchangeInfo | null }) => {
 
   return (
     <>
-      <div className='text-center space-y-4'>
-        <h2 className='text-lg text-pretty font-medium'>This product costs you</h2>
+      <div className='text-center space-y-4 mb-4'>
+        <h2 className='text-lg text-pretty font-medium'>{t('result.timeCost.title')}</h2>
         <TimeCostGrid timeCost={result.timeCost} />
         <CurrencyRate
           productCurrencyToTWD={result.productCurrencyToTWD}
@@ -103,10 +110,10 @@ export const ResultStep = ({ result }: { result: ExchangeInfo | null }) => {
           productCurrency={result.productCurrency}
           salaryCurrency={result.salaryCurrency}
         />
-        <p className='text-lg text-pretty font-medium'>
-          What else you could buy, if you don't buy this product?
-        </p>
       </div>
+      <h3 className='text-lg mb-4 text-center text-pretty font-medium'>
+        {t('result.alternatives.title')}
+      </h3>
       <Tabs
         defaultValue='food'
         className='w-full flex-1'>
@@ -174,19 +181,19 @@ export const ResultStep = ({ result }: { result: ExchangeInfo | null }) => {
           type='button'
           onClick={async () => {
             await navigator.share({
-              title: 'I could buy this product with my salary.',
-              text: `I could buy ${getValues('productPrice')} ${getValues(
-                'productCurrency'
-              )} with my salary. Want to know what can you buy with your salary? Check out this extension: https://chromewebstore.google.com/detail/what-can-i-buy/`,
+              title: t('share.title', {
+                timeCost: result.timeCost.totalHours,
+              }),
+              text: t('share.text'),
             });
           }}>
-          Share this result <ShareIcon className='w-4 h-4' />
+          {t('share.button')} <ShareIcon className='w-4 h-4' />
         </Button>
         <Button
           type='reset'
           variant='outline'
           onClick={handleTryAgain}>
-          Try again <RefreshCwIcon className='w-4 h-4' />
+          {t('tryAgain')} <RefreshCwIcon className='w-4 h-4' />
         </Button>
       </div>
     </>
