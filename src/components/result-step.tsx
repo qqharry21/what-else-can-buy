@@ -86,9 +86,9 @@ const CurrencyRate = ({
   );
 };
 
-const TimeCostResponse = ({ timeCost }: { timeCost: TimeCost }) => {
+const TimeCostResponse = ({ totalHours }: { totalHours: number }) => {
   const { t } = useTranslation();
-  const level = getTimeCostLevel(timeCost);
+  const level = getTimeCostLevel(totalHours);
   // 取得對應陣列
   const responses = t(`timeCostResponses.${level}`, { returnObjects: true }) as string[];
   // 隨機選一句
@@ -220,7 +220,7 @@ export const ResultStep = ({ result }: { result: ExchangeInfo | null }) => {
           productCurrency={result.productCurrency}
           salaryCurrency={result.salaryCurrency}
         />
-        <TimeCostResponse timeCost={result.timeCost} />
+        <TimeCostResponse totalHours={result.timeCost.totalHours} />
       </div>
 
       <h3 className='text-lg mb-4 text-center text-pretty font-medium'>

@@ -1,4 +1,4 @@
-import type { Currency, ExchangeInfo, Product, Salary, TimeCost } from './types';
+import type { Currency, ExchangeInfo, Product, Salary, TimeCostLevel } from './types';
 
 const HOURS_PER_DAY = 8; // Work hours per day
 const DAYS_PER_MONTH = 20; // Work days per month
@@ -98,13 +98,29 @@ export async function calculateProductTime(params: {
 }
 
 /**
- * Get the time cost level, you can adjust the level by yourself
- * @param timeCost time cost
+ * Get the time cost level
+ * @param totalHours total hours
  * @returns time cost level
  */
-export const getTimeCostLevel = (timeCost: TimeCost) => {
-  if (timeCost.years > 0 || timeCost.months > 6) return 'extreme';
-  if (timeCost.months > 0 || timeCost.days > 20) return 'long';
-  if (timeCost.days > 0 || timeCost.hours > 8) return 'medium';
-  return 'short';
+export const getTimeCostLevel = (totalHours: number): TimeCostLevel => {
+  const levels: [number, TimeCostLevel][] = [
+    [0.5, 'instant'],
+    [1, 'quick'],
+    [2, 'a-fewHours'],
+    [4, 'halfDay'],
+    [8, 'oneDay'],
+    [16, 'severalDays'],
+    [40, 'oneWeek'],
+    [120, 'coupleOfWeeks'],
+    [160, 'severalWeeks'],
+    [200, 'oneMonth'],
+    [480, 'coupleOfMonths'],
+    [960, 'severalMonths'],
+    [1920, 'manyMonths'],
+  ];
+
+  for (const [threshold, label] of levels) {
+    if (totalHours <= threshold) return label;
+  }
+  return 'a-yearPlus';
 };

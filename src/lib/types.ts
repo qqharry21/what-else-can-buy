@@ -37,3 +37,19 @@ export type Alternative = {
   icon: string;
   unit?: string;
 };
+
+export type TimeCostLevel =
+  | 'instant'
+  | 'quick'
+  | 'a-fewHours'
+  | 'halfDay'
+  | 'oneDay'
+  | 'severalDays'
+  | 'oneWeek'
+  | 'coupleOfWeeks'
+  | 'severalWeeks'
+  | 'oneMonth'
+  | 'coupleOfMonths'
+  | 'severalMonths'
+  | 'manyMonths'
+  | 'a-yearPlus';

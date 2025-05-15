@@ -6,6 +6,9 @@
   "action": {
     "default_popup": "index.html"
   },
-  "permissions": ["activeTab", "storage", "scripting"],
-  "host_permissions": ["<all_urls>"]
+  "permissions": ["activeTab", "sidePanel", "storage", "scripting"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "service-worker.js"
+  }
 }

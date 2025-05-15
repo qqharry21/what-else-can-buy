@@ -33,7 +33,7 @@ export const ProductStep = () => {
   return (
     <Card className='mb-4'>
       <CardHeader>
-        <CardTitle>{t('productStep.title')}</CardTitle>
+        <CardTitle className='text-lg'>{t('productStep.title')}</CardTitle>
         <CardDescription>{t('productStep.description')}</CardDescription>
       </CardHeader>
       <CardContent className='space-y-4'>
@@ -67,7 +67,9 @@ export const ProductStep = () => {
                   <SelectTrigger className='w-full'>
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent
+                    avoidCollisions={false}
+                    position='popper'>
                     <SelectItem value='TWD'>🇹🇼 {t('currency.TWD')}</SelectItem>
                     <SelectItem value='USD'>🇺🇸 {t('currency.USD')}</SelectItem>
                     <SelectItem value='JPY'>🇯🇵 {t('currency.JPY')}</SelectItem>

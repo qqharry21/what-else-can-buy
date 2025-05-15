@@ -63,29 +63,103 @@
     "JPY": "JPY"
   },
   "timeCostResponses": {
-    "short": [
+    "instant": [
+      "That\u2019s instant \u2014 blink and it's gone.",
+      "Barely a moment! Might as well do it.",
+      "You'd spend more time thinking about it.",
+      "Faster than a microwave snack!",
+      "That\u2019s literally nothing. No regrets."
+    ],
+    "quick": [
       "That's just a coffee break! Go ahead.",
       "A quick task worth the joy!",
       "Barely 15 minutes \u2014 not bad at all.",
-      "Low effort, low guilt."
+      "Low effort, low guilt.",
+      "Faster than a power nap."
     ],
-    "medium": [
+    "a-fewHours": [
+      "Not bad \u2014 a few hours well spent?",
+      "Could\u2019ve watched a long movie instead.",
+      "This is your afternoon talking.",
+      "A mini project worth evaluating.",
+      "Time enough to learn a skill... or not."
+    ],
+    "halfDay": [
       "That\u2019s a half-day of your life. Choose wisely.",
-      "Think twice \u2014 you could have watched 5 movies.",
+      "You could've watched 5 movies.",
       "Would you trade an entire afternoon for this?",
-      "That\u2019s a long meeting's worth of work."
+      "That's a long meeting\u2019s worth of work.",
+      "The sun moves slower than this cost."
     ],
-    "long": [
-      "This is a full week of work. Worth it?",
-      "You\u2019re trading sleep, time, and weekends for this.",
-      "A hundred hours? That\u2019s a whole Netflix season binge!",
-      "Would Future You still thank you after this time sink?"
+    "oneDay": [
+      "A full day. Make it count.",
+      "Hope this brings at least a day's joy.",
+      "24 hours of your time... for what?",
+      "You could\u2019ve taken a day trip instead.",
+      "A deep breath, a day's burn."
     ],
-    "extreme": [
-      "That's almost a month of your life!",
+    "severalDays": [
+      "Multiple days \u2014 getting serious!",
+      "That\u2019s like a short vacation.",
+      "This cost has a name... it's commitment.",
+      "Hope the ROI is worth the time.",
+      "You could've read a book trilogy."
+    ],
+    "oneWeek": [
+      "That's a full work week!",
+      "One week of energy, gone in one decision.",
+      "Hope this lasts longer than a Friday mood.",
+      "Imagine a week of rest \u2014 or this item.",
+      "You just paid in weeks, not dollars."
+    ],
+    "coupleOfWeeks": [
+      "That\u2019s a couple weeks of hustle.",
+      "Could've planned a proper trip.",
+      "Are we budgeting or bleeding time?",
+      "It better be legendary.",
+      "Two weeks \u2014 still worth it?"
+    ],
+    "severalWeeks": [
+      "Several weeks... this is a lifestyle.",
+      "A full-on side quest.",
+      "Hope you're not regretting it already.",
+      "This belongs in your life timeline.",
+      "It\u2019s a season of effort in a box."
+    ],
+    "oneMonth": [
+      "That\u2019s almost a month of your life!",
       "Is this worth more than your vacation?",
-      "That\u2019s legendary-level commitment.",
-      "You could've written a short novel instead."
+      "A month's rent, possibly.",
+      "Could\u2019ve reset your habits instead.",
+      "You paid in time, not money."
+    ],
+    "coupleOfMonths": [
+      "Two months. Time to reflect.",
+      "That\u2019s what startups run on.",
+      "Could\u2019ve learned a language.",
+      "Now that\u2019s ambition.",
+      "Time investment = life shift."
+    ],
+    "severalMonths": [
+      "Several months \u2014 career-level spending.",
+      "You\u2019re almost funding a thesis.",
+      "This better be life-changing.",
+      "This is your quarterly goal.",
+      "Long-term commitment vibes."
+    ],
+    "manyMonths": [
+      "Many months. Epic quest level.",
+      "Are you building a legacy?",
+      "You could\u2019ve toured 3 countries.",
+      "This thing better spark joy daily.",
+      "You could\u2019ve run a marathon \u2014 twice."
+    ],
+    "a-yearPlus": [
+      "That\u2019s a year of work!",
+      "You paid in lifeforce.",
+      "Time to evaluate priorities.",
+      "This is peak dedication.",
+      "Hope it was worth the sacrifice."
     ]
   },
   "alternatives": {

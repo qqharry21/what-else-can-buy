@@ -33,7 +33,7 @@ export const SalaryStep = () => {
   return (
     <Card className='mb-4'>
       <CardHeader>
-        <CardTitle>{t('salaryStep.title')}</CardTitle>
+        <CardTitle className='text-lg'>{t('salaryStep.title')}</CardTitle>
       </CardHeader>
       <CardContent className='space-y-4'>
         <FormField
@@ -67,7 +67,9 @@ export const SalaryStep = () => {
                   <SelectTrigger className='w-full'>
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent
+                    avoidCollisions={false}
+                    position='popper'>
                     <SelectItem value='hourly'>{t('salaryType.hourly')}</SelectItem>
                     <SelectItem value='monthly'>{t('salaryType.monthly')}</SelectItem>
                     <SelectItem value='yearly'>{t('salaryType.yearly')}</SelectItem>
@@ -91,7 +93,9 @@ export const SalaryStep = () => {
                   <SelectTrigger className='w-full'>
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent
+                    avoidCollisions={false}
+                    position='popper'>
                     <SelectItem value='TWD'>🇹🇼 {t('currency.TWD')}</SelectItem>
                     <SelectItem value='USD'>🇺🇸 {t('currency.USD')}</SelectItem>
                     <SelectItem value='JPY'>🇯🇵 {t('currency.JPY')}</SelectItem>
