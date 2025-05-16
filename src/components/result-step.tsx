@@ -1,52 +1,18 @@
-import { QuoteIcon, RefreshCwIcon, ShareIcon } from 'lucide-react';
+import type { ExchangeInfo } from '@/lib/types';
+import { RefreshCwIcon, ShareIcon } from 'lucide-react';
+import { useCallback } from 'react';
 import { useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import { useStepContext } from '@/hooks/useStepContext';
 
+import { AlternativeTabs } from '@/components/alternative-tabs';
+import { CurrencyRate } from '@/components/currency-rate';
+import { TimeCostGrid } from '@/components/time-cost-grid';
+import { TimeCostResponse } from '@/components/time-cost-response';
 import { Button } from '@/components/ui/button';
 
-import { getTimeCostLevel } from '@/lib/calculator';
 import { type FormSchema } from '@/lib/schema';
-import type { ExchangeInfo, TimeCost } from '@/lib/types';
-import { useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
-import { AlternativeTabs } from './alternative-tabs';
-
-const TimeCostGrid = ({ timeCost }: { timeCost: TimeCost }) => {
-  const { t } = useTranslation();
-  return (
-    <div className='flex items-center gap-2 justify-center w-full mx-auto max-w-[400px]'>
-      <TimeCostCard
-        cost={timeCost.years}
-        label={t('years')}
-      />
-      <TimeCostCard
-        cost={timeCost.months}
-        label={t('months')}
-      />
-      <TimeCostCard
-        cost={timeCost.days}
-        label={t('days')}
-      />
-      <TimeCostCard
-        cost={timeCost.hours}
-        label={t('hours')}
-      />
-    </div>
-  );
-};
-
-const TimeCostCard = ({ cost, label }: { cost: number; label: string }) => {
-  const isZero = cost === 0;
-  if (isZero) return null;
-
-  return (
-    <div className='flex items-center self-stretch gap-2 justify-center flex-col p-4 bg-neutral-200 rounded-md aspect-square w-1/4 '>
-      <div className='text-center font-bold text-xl text-neutral-950'>{cost}</div>
-      <div className='text-center text-sm text-neutral-700'>{label}</div>
-    </div>
-  );
-};
 
 const ResultEmpty = ({ onClick }: { onClick: () => void }) => {
   const { t } = useTranslation();
@@ -59,42 +25,6 @@ const ResultEmpty = ({ onClick }: { onClick: () => void }) => {
         onClick={onClick}>
         Try again <RefreshCwIcon className='w-4 h-4' />
       </Button>
-    </div>
-  );
-};
-
-type CurrencyWithRate = Pick<
-  ExchangeInfo,
-  'productCurrencyToTWD' | 'salaryCurrencyToTWD' | 'productCurrency' | 'salaryCurrency'
->;
-
-const CurrencyRate = ({
-  productCurrencyToTWD,
-  salaryCurrencyToTWD,
-  productCurrency,
-  salaryCurrency,
-}: CurrencyWithRate) => {
-  const { t } = useTranslation();
-  return (
-    <div className='text-center text-sm text-neutral-500'>
-      {productCurrencyToTWD !== 1 && <p> 1 TWD ≈ {`${productCurrencyToTWD} ${productCurrency}`}</p>}
-      {salaryCurrencyToTWD !== 1 && <p> 1 TWD ≈ {`${salaryCurrencyToTWD} ${salaryCurrency}`}</p>}
-      {productCurrencyToTWD === salaryCurrencyToTWD && <p>{t('result.same_currency')}</p>}
-    </div>
-  );
-};
-
-const TimeCostResponse = ({ totalHours }: { totalHours: number }) => {
-  const { t } = useTranslation();
-  const level = getTimeCostLevel(totalHours);
-  const responses = t(`timeCostResponses.${level}`, { returnObjects: true }) as string[];
-  const response = responses[Math.floor(Math.random() * responses.length)];
-
-  return (
-    <div className='text-center p-4 bg-neutral-200 rounded-md flex items-start justify-center gap-4'>
-      <QuoteIcon className='w-3 h-3 text-neutral-900 scale-[-1_1]' />
-      <p className='text-sm font-medium text-neutral-800'>{response}</p>
-      <QuoteIcon className='w-3 h-3 text-neutral-900' />
     </div>
   );
 };
