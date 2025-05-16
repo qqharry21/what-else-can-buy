@@ -22,7 +22,7 @@ function App() {
       <div className='bg-white min-h-screen flex flex-col items-center justify-center'>
         <Header />
 
-        <main className='p-4 max-w-3xl mx-auto'>{pageContent[page]}</main>
+        <main className='p-4 w-full max-w-xl mx-auto'>{pageContent[page]}</main>
 
         <Footer />
       </div>
