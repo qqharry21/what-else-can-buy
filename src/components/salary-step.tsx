@@ -21,11 +21,19 @@ import { useTranslation } from 'react-i18next';
 export const SalaryStep = () => {
   const { t } = useTranslation();
   const { setStep } = useStepContext();
-  const { control } = useFormContext<FormSchema>();
+  const { control, getValues } = useFormContext<FormSchema>();
   const { validateStep } = useStepValidation(['amount', 'salaryType', 'currency']);
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (validateStep()) {
+      const [amount, salaryType, currency] = getValues(['amount', 'salaryType', 'currency']);
+      await chrome.storage.sync.set({
+        salary: {
+          amount,
+          salaryType,
+          currency,
+        },
+      });
       setStep(2);
     }
   };

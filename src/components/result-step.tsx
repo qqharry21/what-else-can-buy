@@ -34,8 +34,14 @@ export const ResultStep = ({ result }: { result: ExchangeInfo | null }) => {
   const { reset } = useFormContext<FormSchema>();
   const { setStep } = useStepContext();
 
-  const handleTryAgain = useCallback(() => {
-    reset();
+  const handleTryAgain = useCallback(async () => {
+    const { salary } = await chrome.storage.sync.get('salary');
+    console.log('🚨 - salary', salary);
+    reset({
+      amount: salary.amount,
+      salaryType: salary.salaryType,
+      currency: salary.currency,
+    });
     setStep(1);
   }, [reset, setStep]);
 

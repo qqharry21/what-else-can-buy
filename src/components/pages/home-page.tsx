@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { StepContextProvider } from '@/contexts/step-context';
@@ -50,6 +50,19 @@ const HomePageInner = () => {
       setResult(null);
     }
   };
+
+  useEffect(() => {
+    const fetchSalary = async () => {
+      const salary = await chrome.storage.sync.get('salary');
+      if (salary) {
+        form.setValue('amount', salary.salary.amount);
+        form.setValue('salaryType', salary.salary.salaryType);
+        form.setValue('currency', salary.salary.currency);
+      }
+    };
+    void fetchSalary();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <Form {...form}>
