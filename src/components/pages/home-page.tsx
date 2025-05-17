@@ -44,6 +44,13 @@ const HomePageInner = () => {
         },
       });
       setResult(rates);
+      await chrome.storage.sync.set({
+        salary: {
+          amount: data.amount,
+          salaryType: data.salaryType,
+          currency: data.currency,
+        },
+      });
       setStep(3);
     } catch (error) {
       console.error('🚨 - error', error);
@@ -53,11 +60,12 @@ const HomePageInner = () => {
 
   useEffect(() => {
     const fetchSalary = async () => {
-      const salary = await chrome.storage.sync.get('salary');
+      const { salary } = await chrome.storage.sync.get('salary');
+      console.log('🚨 - salary', salary);
       if (salary) {
-        form.setValue('amount', salary.salary.amount);
-        form.setValue('salaryType', salary.salary.salaryType);
-        form.setValue('currency', salary.salary.currency);
+        form.setValue('amount', salary.amount);
+        form.setValue('salaryType', salary.salaryType);
+        form.setValue('currency', salary.currency);
       }
     };
     void fetchSalary();
