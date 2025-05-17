@@ -1,5 +1,5 @@
-const fs = require('fs');
-const fetch = require('node-fetch');
+import fs from 'fs';
+import fetch from 'node-fetch';
 
 const API_KEY = process.env.EXCHANGE_RATE_KEY;
 const API_URL = `https://v6.exchangerate-api.com/v6/${API_KEY}/latest/TWD`;

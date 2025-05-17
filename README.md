@@ -1,6 +1,6 @@
 # What Else Could You Buy?
 
-A browser extension that shows what else you could buy for the same price.
+A sidebar browser extension that shows what else you could buy for the same price.
 
 ## Features
 
