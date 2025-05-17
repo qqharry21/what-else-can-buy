@@ -4,7 +4,7 @@ const HOURS_PER_DAY = 8; // Work hours per day
 const DAYS_PER_MONTH = 20; // Work days per month
 const MONTHS_PER_YEAR = 12; // Work months per year
 
-const VITE_PUBLIC_URL = import.meta.env.VITE_PUBLIC_URL;
+const VITE_PUBLIC_URL = import.meta.env.VITE_PUBLIC_URL ?? '.';
 const RATES_URL = `${VITE_PUBLIC_URL}/rates.json`;
 
 type ExchangeRates = {

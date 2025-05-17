@@ -59,16 +59,15 @@ const HomePageInner = () => {
   };
 
   useEffect(() => {
-    const fetchSalary = async () => {
-      const { salary } = await chrome.storage.sync.get('salary');
-      console.log('🚨 - salary', salary);
-      if (salary) {
-        form.setValue('amount', salary.amount);
-        form.setValue('salaryType', salary.salaryType);
-        form.setValue('currency', salary.currency);
+    void chrome.storage.sync.get('salary').then((result) => {
+      console.log('🚨 - result', result);
+      if (result?.salary) {
+        form.setValue('amount', result.salary.amount);
+        form.setValue('salaryType', result.salary.salaryType);
+        form.setValue('currency', result.salary.currency);
       }
-    };
-    void fetchSalary();
+    });
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
