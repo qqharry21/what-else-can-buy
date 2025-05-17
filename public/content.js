@@ -1,4 +1,4 @@
-// content.js for Price Context Extension (with Currency Conversion)
+// content.js for Price Context Extension (Site-Specific Price Finding)
 
 // --- Default Configuration ---
 const DEFAULT_WORK_HOURS_PER_DAY = 8;
@@ -12,6 +12,22 @@ let EXCHANGE_RATES = null; // To store rates from rates.json
 
 const PROCESSED_MARKER_CLASS = 'price-context-processed';
 const PRICE_INFO_SPAN_CLASS = 'price-context-display';
+
+let CURRENT_HOSTNAME = ''; // To store the current page's hostname
+
+// --- Utility Functions ---
+
+/**
+ * Gets the current page's hostname.
+ */
+function storeCurrentHostname() {
+  try {
+    CURRENT_HOSTNAME = window.location.hostname;
+  } catch (e) {
+    console.error('Price Context Engine: Could not get hostname.', e);
+    CURRENT_HOSTNAME = '';
+  }
+}
 
 // --- Currency and Rate Functions ---
 
@@ -52,33 +68,28 @@ function mapSymbolToCode(symbolOrCode) {
   const s = symbolOrCode.toUpperCase().trim();
 
   if (EXCHANGE_RATES && EXCHANGE_RATES.hasOwnProperty(s)) {
-    // Already a known code like TWD, USD, JPY
     return s;
   }
 
-  // Symbol mapping - extend as needed
   if (s === '$' || s === 'US$' || s.includes('USD')) return 'USD';
-  if (s === '¥' || s.includes('JPY') || s === 'YEN') return 'JPY'; // ¥ is ambiguous (CNY), prioritize JPY for this set
+  if (s === '¥' || s.includes('JPY') || s === 'YEN') return 'JPY';
   if (s === 'NT$' || s.includes('TWD') || s === 'NTD') return 'TWD';
 
-  // Check again if the mapped symbol is a valid rate code
   if (s === 'USD' && EXCHANGE_RATES && EXCHANGE_RATES.hasOwnProperty('USD')) return 'USD';
   if (s === 'JPY' && EXCHANGE_RATES && EXCHANGE_RATES.hasOwnProperty('JPY')) return 'JPY';
   if (s === 'TWD' && EXCHANGE_RATES && EXCHANGE_RATES.hasOwnProperty('TWD')) return 'TWD';
 
-  console.warn(`Price Context Engine: Unrecognized currency symbol/code: ${symbolOrCode}`);
   return null;
 }
 
 /**
  * Converts an amount from a source currency to the user's target currency.
  * @param {number} amount - The amount to convert.
- * @param {string} sourceCurrencyCode - The 3-letter code of the source currency (e.g., 'USD').
+ * @param {string} sourceCurrencyCode - The 3-letter code of the source currency.
  * @returns {number|null} The converted amount in the user's currency, or null if conversion is not possible.
  */
 function convertToUserCurrency(amount, sourceCurrencyCode) {
   if (!EXCHANGE_RATES || !USER_CONFIG.currency) {
-    console.warn('Price Context Engine: Exchange rates or user currency not set for conversion.');
     return null;
   }
   const targetCurrencyCode = USER_CONFIG.currency;
@@ -88,19 +99,10 @@ function convertToUserCurrency(amount, sourceCurrencyCode) {
   }
 
   if (!EXCHANGE_RATES[sourceCurrencyCode] || !EXCHANGE_RATES[targetCurrencyCode]) {
-    console.warn(
-      `Price Context Engine: Missing exchange rate for ${sourceCurrencyCode} or ${targetCurrencyCode}.`
-    );
     return null;
   }
 
-  // Convert source currency to TWD (base currency in rates.json)
-  // rates[sourceCurrencyCode] is how many units of sourceCurrency you get for 1 TWD
-  // So, amountInTWD = amountInSource / rate_of_source_per_TWD
   const amountInTWD = amount / EXCHANGE_RATES[sourceCurrencyCode];
-
-  // Convert amountInTWD to target currency
-  // finalAmount = amountInTWD * rate_of_target_per_TWD
   const convertedAmount = amountInTWD * EXCHANGE_RATES[targetCurrencyCode];
 
   return convertedAmount;
@@ -114,46 +116,35 @@ function convertToUserCurrency(amount, sourceCurrencyCode) {
 function parsePrice(text) {
   if (!text || !EXCHANGE_RATES) return null;
 
-  // Define currency patterns based on available rates and common symbols
-  const knownRateCodes = Object.keys(EXCHANGE_RATES); // ['TWD', 'USD', 'JPY']
-  const currencyCodePattern = `(${knownRateCodes.join('|')})`; // (TWD|USD|JPY)
-
-  // Add common symbols that map to these codes
-  // Be careful with symbols like '$' which might be used by other currencies not in rates.json
-  // This specific version prioritizes codes from rates.json
-  const currencySymbolPattern = '(US\\$|NT\\$|\\$|¥)'; // ¥ for JPY, $ for USD, NT$ for TWD
-  const combinedCurrencyPattern = `(${knownRateCodes.join('|')}|US\\$|NT\\$|\\$|¥)`; // More specific
-
+  const knownRateCodes = Object.keys(EXCHANGE_RATES);
+  const currencyCodePattern = `(${knownRateCodes.join('|')})`;
+  const currencySymbolPattern = '(US\\$|NT\\$|\\$|¥)';
+  const combinedCurrencyPattern = `(${knownRateCodes.join('|')}|US\\$|NT\\$|\\$|¥)`;
   const numberPattern = '([0-9,]+(?:[\\.,][0-9]{1,2})?)';
-
-  // Regex attempts:
-  // 1. CURRENCY_CODE Amount (e.g., USD 10.99) - Most reliable
-  // 2. CURRENCY_SYMBOL Amount (e.g., $10.99)
-  // 3. Amount CURRENCY_CODE (e.g., 10.99 USD)
 
   let match;
   let amountStr, detectedSymbolOrCode;
 
-  // Attempt 1: Explicit code like "USD 12.34" or "JPY 1000"
-  const regexCodeFirst = new RegExp(`${currencyCodePattern}\\s*${numberPattern}`, 'i');
+  const regexCodeFirst = new RegExp(`^\\s*${currencyCodePattern}\\s*${numberPattern}`, 'i');
   match = text.match(regexCodeFirst);
   if (match) {
-    detectedSymbolOrCode = match[1]; // This is a code like 'USD', 'JPY', 'TWD'
+    detectedSymbolOrCode = match[1];
     amountStr = match[2];
   } else {
-    // Attempt 2: Symbol like "$12.34" or "¥1000" or "NT$500"
-    const regexSymbolFirst = new RegExp(`${combinedCurrencyPattern}\\s*${numberPattern}`, 'i');
+    const regexSymbolFirst = new RegExp(`^\\s*${combinedCurrencyPattern}\\s*${numberPattern}`, 'i');
     match = text.match(regexSymbolFirst);
     if (match) {
-      detectedSymbolOrCode = match[1]; // This is a symbol or code
+      detectedSymbolOrCode = match[1];
       amountStr = match[2];
     } else {
-      // Attempt 3: Amount then code "12.34 USD" or "1000 JPY"
-      const regexAmountFirstCode = new RegExp(`${numberPattern}\\s*${currencyCodePattern}`, 'i');
+      const regexAmountFirstCode = new RegExp(
+        `^\\s*${numberPattern}\\s*${currencyCodePattern}`,
+        'i'
+      );
       match = text.match(regexAmountFirstCode);
       if (match) {
         amountStr = match[1];
-        detectedSymbolOrCode = match[2]; // This is a code
+        detectedSymbolOrCode = match[2];
       }
     }
   }
@@ -164,24 +155,25 @@ function parsePrice(text) {
 
   const currencyCode = mapSymbolToCode(detectedSymbolOrCode);
   if (!currencyCode) {
-    // If symbol couldn't be mapped to a known/convertible currency
     return null;
   }
 
   const normalizedAmountStr = normalizeNumberString(amountStr);
   const amount = parseFloat(normalizedAmountStr);
 
-  if (isNaN(amount)) return null;
+  if (isNaN(amount) || amount <= 0) return null;
 
   return { amount, currency: currencyCode };
 }
 
 /**
- * Standardizes number strings (handles different decimal/thousands separators).
+ * Standardizes number strings.
  * @param {string} numberString - The number string to normalize.
  * @returns {string} - Normalized number string.
  */
 function normalizeNumberString(numberString) {
+  numberString = numberString.replace(/(USD|JPY|TWD|US\$|NT\$|\$|¥)/gi, '').trim();
+
   if (numberString.includes('.') && numberString.includes(',')) {
     if (numberString.lastIndexOf('.') < numberString.lastIndexOf(',')) {
       return numberString.replace(/\./g, '').replace(',', '.');
@@ -196,10 +188,10 @@ function normalizeNumberString(numberString) {
       return numberString.replace(/,/g, '');
     }
   }
-  return numberString.replace(/[^\d\.]/g, ''); // Clean any remaining non-digits except dot
+  return numberString.replace(/[^\d\.]/g, '');
 }
 
-// --- Formatting Functions (Work Time, Base Item) ---
+// --- Formatting Functions ---
 function formatWorkTime(totalHours) {
   if (HOURLY_RATE <= 0 || totalHours <= 0) return '';
   if (totalHours < 1 / 60) return `<1 min`;
@@ -211,27 +203,15 @@ function formatWorkTime(totalHours) {
   return `${fixedHours} hr${fixedHours === 1.0 ? '' : 's'}`;
 }
 
-function formatBaseItemEquivalency(priceInUserCurrency) {
-  if (!USER_CONFIG.baseItem || USER_CONFIG.baseItem.price <= 0 || priceInUserCurrency <= 0)
-    return '';
-  const quantity = Math.floor(priceInUserCurrency / USER_CONFIG.baseItem.price);
-  if (quantity <= 0) return '';
-  return `${quantity} ${
-    quantity === 1 ? USER_CONFIG.baseItem.singularName : USER_CONFIG.baseItem.name
-  }`;
-}
-
 // --- DOM Manipulation ---
 function findAndAppendPriceContext(contextNode) {
-  if (!EXCHANGE_RATES) {
-    console.warn('Price Context Engine: Exchange rates not loaded. Cannot process prices.');
-    return;
-  }
-  if (HOURLY_RATE <= 0 && (!USER_CONFIG.baseItem || USER_CONFIG.baseItem.price <= 0)) {
-    return; // Nothing to display if no rate and no base item
-  }
+  if (!EXCHANGE_RATES) return;
+  if (HOURLY_RATE <= 0 && (!USER_CONFIG.baseItem || USER_CONFIG.baseItem.price <= 0)) return;
 
-  const candidateSelectors = [
+  // Define candidate selectors
+  // Amazon-specific selectors are more targeted
+  const amazonCandidateSelectors = '.a-price .a-offscreen, .a-price';
+  const genericCandidateSelectors = [
     'span',
     'div',
     'p',
@@ -252,114 +232,151 @@ function findAndAppendPriceContext(contextNode) {
     '.product-price',
     '.current-price',
     '.sale-price',
-    '.a-price .a-offscreen',
-    '.a-price', // Amazon specific
   ].join(', ');
+
+  const isAmazon = CURRENT_HOSTNAME.includes('amazon.');
+  const currentSelectors = isAmazon ? amazonCandidateSelectors : genericCandidateSelectors;
 
   let elements;
   try {
-    if (contextNode.querySelectorAll) elements = contextNode.querySelectorAll(candidateSelectors);
-    else if (contextNode.parentElement?.querySelectorAll)
-      elements = contextNode.parentElement.querySelectorAll(candidateSelectors);
-    else return;
+    if (
+      contextNode.nodeType === Node.ELEMENT_NODE ||
+      contextNode.nodeType === Node.DOCUMENT_FRAGMENT_NODE
+    ) {
+      elements = contextNode.querySelectorAll(currentSelectors);
+    } else if (contextNode.parentElement?.querySelectorAll) {
+      elements = contextNode.parentElement.querySelectorAll(currentSelectors);
+    } else {
+      return;
+    }
   } catch (e) {
     console.error('Price Context Engine: Error querying selectors:', e);
     return;
   }
 
   elements.forEach((el) => {
-    // 跳過已處理過的元素
-    if (
-      el.classList.contains(PROCESSED_MARKER_CLASS) ||
-      el.classList.contains(PRICE_INFO_SPAN_CLASS) ||
-      el.closest(`.${PRICE_INFO_SPAN_CLASS}`) ||
-      el.querySelector(`.${PRICE_INFO_SPAN_CLASS}`)
-    ) {
+    if (el.classList.contains(PROCESSED_MARKER_CLASS)) return;
+    if (el.classList.contains(PRICE_INFO_SPAN_CLASS) || el.closest(`.${PRICE_INFO_SPAN_CLASS}`))
       return;
+    if (el.querySelector(`:scope > .${PRICE_INFO_SPAN_CLASS}`)) return;
+
+    let textToParse = '';
+    if (isAmazon) {
+      // Amazon-specific text extraction
+      if (el.matches('.a-price .a-offscreen')) {
+        // Specific target for clean price
+        textToParse = el.textContent;
+      } else if (el.matches('.a-price')) {
+        // Container for price parts
+        const offscreen = el.querySelector('.a-offscreen');
+        if (offscreen && offscreen.textContent) {
+          textToParse = offscreen.textContent;
+        } else {
+          // Fallback for .a-price: reconstruct from visible parts, excluding our own spans
+          let tempText = '';
+          el.childNodes.forEach((child) => {
+            if (child.nodeType === Node.TEXT_NODE) {
+              tempText += child.textContent;
+            } else if (
+              child.nodeType === Node.ELEMENT_NODE &&
+              !child.classList.contains(PRICE_INFO_SPAN_CLASS)
+            ) {
+              // For Amazon, .a-price-symbol, .a-price-whole, .a-price-fraction are common
+              tempText += child.textContent || ''; // textContent is usually better here
+            }
+          });
+          textToParse = tempText;
+        }
+      } else {
+        // If a generic selector matched on Amazon, but it's not .a-price or .a-offscreen
+        // This case should be less common if amazonCandidateSelectors are specific enough
+        textToParse = el.innerText || el.textContent;
+      }
+    } else {
+      // Generic text extraction for other sites
+      // Prioritize direct text content if the element has no children or few meaningful ones.
+      // Otherwise, innerText can be a good general approach.
+      if (el.children.length === 0) {
+        textToParse = el.textContent;
+      } else {
+        // For elements with children, innerText often gives a good representation.
+        // The parsePrice regex is anchored, so it will try to match at the start.
+        textToParse = el.innerText;
+      }
     }
 
-    // 獲取要解析的文本
-    const textToParse =
-      el.matches && el.matches('.a-offscreen')
-        ? el.textContent
-        : (el.innerText || el.textContent || '').trim();
-
+    if (!textToParse) textToParse = el.textContent; // Final fallback if other methods yielded nothing
+    textToParse = textToParse?.trim();
     if (!textToParse) return;
 
-    // 解析價格
     const parsedPriceData = parsePrice(textToParse);
-    if (!parsedPriceData || parsedPriceData.amount <= 0 || !parsedPriceData.currency) return;
 
-    // 轉換為用戶貨幣
-    const priceInUserCurrency = convertToUserCurrency(
-      parsedPriceData.amount,
-      parsedPriceData.currency
-    );
+    if (parsedPriceData && parsedPriceData.amount > 0 && parsedPriceData.currency) {
+      const priceInUserCurrency = convertToUserCurrency(
+        parsedPriceData.amount,
+        parsedPriceData.currency
+      );
 
-    if (priceInUserCurrency === null || priceInUserCurrency <= 0) return;
+      if (priceInUserCurrency === null || priceInUserCurrency <= 0) return;
 
-    // 判斷是否為價格容器
-    const isLikelyPriceContainer =
-      (el.children.length > 0 && el.children.length < 7) ||
-      el.matches('.price, [class*="price"], [itemprop="price"], .a-price') ||
-      (el.children.length === 0 && textToParse.length < 30);
+      // Simplified heuristic for now, can be made site-specific too
+      const isLikelyPriceContainer =
+        (el.children.length < 5 && textToParse.length < 50) ||
+        el.matches('.price, [class*="price"], [itemprop="price"], .a-price') ||
+        (el.children.length === 0 && textToParse.length < 30);
 
-    if (!isLikelyPriceContainer || textToParse.length >= 100) return;
+      if (isLikelyPriceContainer && textToParse.length < 100) {
+        const workTimeText =
+          HOURLY_RATE > 0 ? formatWorkTime(priceInUserCurrency / HOURLY_RATE) : '';
 
-    // 生成顯示文本
-    const displayTexts = [];
+        let displayText = [];
+        if (workTimeText) displayText.push(workTimeText);
 
-    if (HOURLY_RATE > 0) {
-      const workTimeText = formatWorkTime(priceInUserCurrency / HOURLY_RATE);
-      if (workTimeText) displayTexts.push(workTimeText);
-    }
-
-    const baseItemText = formatBaseItemEquivalency(priceInUserCurrency);
-    if (baseItemText) displayTexts.push(baseItemText);
-
-    if (displayTexts.length > 0) {
-      const infoSpan = document.createElement('span');
-      infoSpan.className = PRICE_INFO_SPAN_CLASS;
-      infoSpan.textContent = ` (${displayTexts.join(' or ')})`;
-      el.appendChild(infoSpan);
-      el.classList.add(PROCESSED_MARKER_CLASS);
+        if (displayText.length > 0) {
+          const infoSpan = document.createElement('span');
+          infoSpan.className = PRICE_INFO_SPAN_CLASS;
+          infoSpan.textContent = ` (${displayText.join(' or ')})`;
+          el.appendChild(infoSpan);
+          el.classList.add(PROCESSED_MARKER_CLASS);
+        }
+      }
     }
   });
 }
 
 // --- Main Execution Flow ---
 async function initializeExtension(settings) {
-  // Set user configuration (salary currency is the display currency)
+  storeCurrentHostname(); // Store hostname once at init
+
   USER_CONFIG = {
     salary: parseFloat(settings.salary?.amount) || 0,
     salaryType: settings.salary?.salaryType || 'annual',
-    currency: mapSymbolToCode(settings.salary?.currency) || 'USD', // User's preferred currency for display
+    currency: mapSymbolToCode(settings.salary?.currency) || 'USD',
     workHoursPerDay: settings.workHoursPerDay || DEFAULT_WORK_HOURS_PER_DAY,
     baseItem: {
       name: settings.baseItem?.name || 'coffees',
       singularName: settings.baseItem?.singularName || 'coffee',
-      price: parseFloat(settings.baseItem?.price) || 5.0, // Assumed to be in USER_CONFIG.currency
+      price: parseFloat(settings.baseItem?.price) || 5.0,
     },
-    // currencySymbol is mainly for display if needed, actual currency code is USER_CONFIG.currency
     currencySymbol: settings.salary?.currencySymbol || settings.salary?.currency || '$',
   };
 
-  // Ensure USER_CONFIG.currency is one of the known rate codes if possible
-  if (!EXCHANGE_RATES[USER_CONFIG.currency]) {
+  if (!EXCHANGE_RATES) {
+    console.error('Price Context Engine: EXCHANGE_RATES not available during initialization.');
+  } else if (!EXCHANGE_RATES[USER_CONFIG.currency]) {
     console.warn(
-      `User's configured currency ${USER_CONFIG.currency} is not in exchange rates. Defaulting calculations to USD if possible or disabling.`
+      `User's configured currency ${USER_CONFIG.currency} is not in exchange rates. Defaulting calculations to USD if possible.`
     );
     if (EXCHANGE_RATES['USD']) {
-      USER_CONFIG.currency = 'USD'; // Fallback if user's currency is not convertible
+      USER_CONFIG.currency = 'USD';
+    } else if (Object.keys(EXCHANGE_RATES).length > 0) {
+      USER_CONFIG.currency = Object.keys(EXCHANGE_RATES)[0];
+      console.warn(`Falling back user currency to ${USER_CONFIG.currency}`);
     } else {
-      // If USD is also not available, currency features will be largely disabled.
-      // HOURLY_RATE might be zero or calculations might fail.
-      console.error('Fallback currency USD not found in rates. Currency conversions may not work.');
+      console.error('No exchange rates available. Currency conversions will fail.');
     }
   }
 
-  // Calculate HOURLY_RATE in USER_CONFIG.currency
-  // Salary amount is assumed to be in USER_CONFIG.currency
   const workHoursPerWeek = USER_CONFIG.workHoursPerDay * DEFAULT_WORK_DAYS_PER_WEEK;
   let annualSalaryInUserCurrency = USER_CONFIG.salary;
 
@@ -367,7 +384,7 @@ async function initializeExtension(settings) {
     annualSalaryInUserCurrency = USER_CONFIG.salary * DEFAULT_MONTHS_PER_YEAR;
   }
 
-  if (workHoursPerWeek > 0) {
+  if (workHoursPerWeek > 0 && annualSalaryInUserCurrency > 0) {
     HOURLY_RATE =
       annualSalaryInUserCurrency / (DEFAULT_WEEKS_PER_YEAR_FOR_ANNUAL * workHoursPerWeek);
   } else {
@@ -377,9 +394,11 @@ async function initializeExtension(settings) {
   if (isNaN(HOURLY_RATE) || HOURLY_RATE < 0) HOURLY_RATE = 0;
 
   console.log(
-    `Price Context Engine active. User Currency: ${USER_CONFIG.currency}. Hourly rate: ${
-      USER_CONFIG.currencySymbol // This might not match USER_CONFIG.currency if symbol was generic like '$'
-    }${HOURLY_RATE.toFixed(2)} ${USER_CONFIG.currency}` +
+    `Price Context Engine active on ${CURRENT_HOSTNAME}. User Currency: ${
+      USER_CONFIG.currency
+    }. Hourly rate: ${USER_CONFIG.currencySymbol}${HOURLY_RATE.toFixed(2)} ${
+      USER_CONFIG.currency
+    }` +
       (USER_CONFIG.baseItem.price > 0
         ? `, Base item: ${USER_CONFIG.baseItem.name} at ${
             USER_CONFIG.currencySymbol
@@ -391,18 +410,37 @@ async function initializeExtension(settings) {
 
   const observer = new MutationObserver((mutationsList) => {
     for (const mutation of mutationsList) {
+      if (mutation.target.classList && mutation.target.classList.contains(PRICE_INFO_SPAN_CLASS))
+        continue;
+      if (
+        mutation.target.parentElement &&
+        mutation.target.parentElement.classList.contains(PRICE_INFO_SPAN_CLASS)
+      )
+        continue;
+
       if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
         mutation.addedNodes.forEach((newNode) => {
-          if (newNode.nodeType === Node.ELEMENT_NODE) findAndAppendPriceContext(newNode);
-          else if (newNode.nodeType === Node.TEXT_NODE && newNode.parentElement)
+          if (
+            newNode.nodeType === Node.ELEMENT_NODE &&
+            !newNode.classList.contains(PRICE_INFO_SPAN_CLASS)
+          ) {
+            findAndAppendPriceContext(newNode);
+          } else if (
+            newNode.nodeType === Node.TEXT_NODE &&
+            newNode.parentElement &&
+            !newNode.parentElement.classList.contains(PRICE_INFO_SPAN_CLASS)
+          ) {
             findAndAppendPriceContext(newNode.parentElement);
+          }
         });
       } else if (mutation.type === 'characterData' && mutation.target.parentElement) {
+        const parent = mutation.target.parentElement;
         if (
-          !mutation.target.parentElement.classList.contains(PROCESSED_MARKER_CLASS) &&
-          !mutation.target.parentElement.classList.contains(PRICE_INFO_SPAN_CLASS)
+          !parent.classList.contains(PRICE_INFO_SPAN_CLASS) &&
+          !parent.classList.contains(PROCESSED_MARKER_CLASS) &&
+          !parent.querySelector(`:scope > .${PRICE_INFO_SPAN_CLASS}`)
         ) {
-          findAndAppendPriceContext(mutation.target.parentElement);
+          findAndAppendPriceContext(parent);
         }
       }
     }
@@ -410,27 +448,21 @@ async function initializeExtension(settings) {
   observer.observe(document.body, { childList: true, subtree: true, characterData: true });
 }
 
-// Start the process: Load rates, then settings, then initialize.
+// Start the process
 (async () => {
   EXCHANGE_RATES = await loadExchangeRates();
-  if (!EXCHANGE_RATES) {
-    console.error(
-      'Price Context Engine: Could not load exchange rates. Currency conversion will be disabled.'
-    );
-    // Proceed with initialization but currency features will be limited.
-    // Or, decide to not initialize at all if rates are critical.
-  }
+  storeCurrentHostname(); // Store hostname after rates might be loaded (though not dependent)
 
-  chrome.storage.sync.get(['salary', 'workHoursPerDay', 'baseItem'], (result) => {
+  chrome.storage.sync.get('salary', (result) => {
     if (chrome.runtime.lastError) {
       console.error('Error loading settings:', chrome.runtime.lastError.message);
-      initializeExtension({}); // Initialize with defaults
+      initializeExtension({});
       return;
     }
     const settings = {
-      salary: result.salary || {},
-      workHoursPerDay: result.workHoursPerDay,
-      baseItem: result.baseItem || {},
+      salary: result?.salary || {},
+      workHoursPerDay: DEFAULT_WORK_HOURS_PER_DAY,
+      baseItem: {},
     };
     initializeExtension(settings);
   });
