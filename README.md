@@ -1,4 +1,4 @@
-# What Else Buy - Browser Extension
+# What Else Can Buy - Browser Extension
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![GitHub issues](https://img.shields.io/github/issues/qqharry21/what-else-can-buy)](https://github.com/qqharry21/what-else-can-buy/issues) [![GitHub stars](https://img.shields.io/github/stars/qqharry21/what-else-can-buy)](https://github.com/qqharry21/what-else-can-buy/stargazers)
 

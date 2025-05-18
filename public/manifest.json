@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "What Else Could You Buy For Your Salary?",
+  "name": "What Else Can Buy",
   "version": "1.0",
-  "description": "Shows how much work times for this product, and what else you could buy for the same price.",
+  "description": "A browser extension that helps you make more informed purchasing decisions by converting product prices into your working hours.",
   "action": {
     "default_popup": "index.html"
   },
