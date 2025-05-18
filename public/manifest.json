@@ -3,6 +3,12 @@
   "name": "What Else Can Buy",
   "version": "1.0",
   "description": "A browser extension that helps you make more informed purchasing decisions by converting product prices into your working hours.",
+  "icons": {
+    "16": "icon_16x16.png",
+    "32": "icon_32x32.png",
+    "48": "icon_48x48.png",
+    "128": "icon_128x128.png"
+  },
   "action": {
     "default_popup": "index.html"
   },
