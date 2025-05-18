@@ -307,5 +307,18 @@
         }
       ]
     }
+  },
+  "settings": {
+    "title": "設置",
+    "language": {
+      "description": "更改擴展套件的語言",
+      "title": "顯示語言"
+    },
+    "enable": {
+      "title": "啟用",
+      "description": "啟用或停用擴展套件",
+      "enable": "啟用",
+      "notEnable": "未啟用"
+    }
   }
 }

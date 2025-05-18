@@ -1,19 +1,26 @@
-import { createContext, useMemo, useState } from 'react';
+import i18n from '@/i18n';
+import { createContext, useEffect, useMemo, useState } from 'react';
 
 type GlobalContextType = {
-  available: boolean;
-  setAvailable: (available: boolean) => void;
+  enabled: boolean;
+  setEnabled: (enabled: boolean) => void;
 };
 
 const GlobalContext = createContext<GlobalContextType>({
-  available: false,
-  setAvailable: () => {},
+  enabled: false,
+  setEnabled: () => {},
 });
 
 export const GlobalContextProvider = ({ children }: { children: React.ReactNode }) => {
-  const [available, setAvailable] = useState<boolean>(false);
+  const [enabled, setEnabled] = useState<boolean>(true);
 
-  const memoValue = useMemo(() => ({ available, setAvailable }), [available, setAvailable]);
+  const memoValue = useMemo(() => ({ enabled, setEnabled }), [enabled, setEnabled]);
+
+  useEffect(() => {
+    void chrome.storage.local.get('language').then((result) => {
+      void i18n.changeLanguage(result?.language ?? 'zh_TW');
+    });
+  }, []);
 
   return <GlobalContext value={memoValue}>{children}</GlobalContext>;
 };

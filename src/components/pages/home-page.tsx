@@ -60,7 +60,6 @@ const HomePageInner = () => {
 
   useEffect(() => {
     void chrome.storage.sync.get('salary').then((result) => {
-      console.log('🚨 - result', result);
       if (result?.salary) {
         form.setValue('amount', result.salary.amount);
         form.setValue('salaryType', result.salary.salaryType);
