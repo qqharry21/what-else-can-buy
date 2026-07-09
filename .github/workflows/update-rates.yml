@@ -1,8 +1,6 @@
 name: Update Exchange Rates
 
 on:
-  schedule:
-    - cron: '0 */12 * * *' # 每 12 小時
   workflow_dispatch:
 
 permissions:
